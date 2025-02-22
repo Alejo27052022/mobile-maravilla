@@ -12,14 +12,15 @@
         android:padding="20dp">
 
         <ImageView
-            android:layout_width="100dp"
-            android:layout_height="60dp"
+            android:layout_width="200dp"
+            android:layout_height="100dp"
             android:scaleType="centerCrop"
             android:layout_gravity="center"
             android:layout_marginBottom="20dp"
             android:src="@drawable/maravillasinfondo"/>
 
         <TextView
+            android:id="@+id/nombre_usuario"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Hola [Nombre]"
@@ -29,90 +30,93 @@
 
     </LinearLayout>
 
-    <LinearLayout
+    <View
         android:layout_width="match_parent"
         android:layout_height="3dp"
         android:layout_marginEnd="60dp"
         android:layout_marginStart="20dp"
-        android:background="@color/yellow_marca"
-        android:orientation="vertical">
-    </LinearLayout>
+        android:background="@color/yellow_marca"/>
 
+    <!-- Contenido principal que se expande -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/fondo1"
-        android:orientation="vertical"
-        android:layout_marginTop="20dp"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp"
-        android:paddingEnd="20dp"
-        android:paddingStart="20dp">
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Categorias"
-            android:layout_marginBottom="20dp"
-            android:textColor="@color/black"
-            android:textSize="18sp"
-            android:textStyle="bold"/>
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler_view_categoria"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:scrollbars="horizontal" />
-    </LinearLayout>
+            android:background="@color/fondo1"
+            android:orientation="vertical"
+            android:layout_marginTop="20dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:paddingEnd="20dp"
+            android:paddingStart="20dp">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="3dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="60dp"
-        android:layout_marginStart="20dp"
-        android:background="@color/yellow_marca"
-        android:orientation="vertical">
-    </LinearLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Categorias"
+                android:layout_marginBottom="20dp"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                android:textStyle="bold"/>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/fondo1"
-        android:orientation="vertical"
-        android:layout_marginTop="20dp"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp"
-        android:paddingEnd="20dp"
-        android:paddingStart="20dp">
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_view_categoria"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scrollbars="horizontal"/>
+        </LinearLayout>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Menú de hoy"
-            android:layout_marginBottom="20dp"
-            android:textColor="@color/black"
-            android:textSize="18sp"
-            android:textStyle="bold"/>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="60dp"
+            android:layout_marginStart="20dp"
+            android:background="@color/yellow_marca"/>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler_view"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:scrollbars="horizontal" />
+            android:background="@color/fondo1"
+            android:orientation="vertical"
+            android:layout_marginTop="20dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:paddingEnd="20dp"
+            android:paddingStart="20dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Menú de hoy"
+                android:layout_marginBottom="20dp"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                android:textStyle="bold"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scrollbars="horizontal"/>
+        </LinearLayout>
     </LinearLayout>
 
+    <!-- Barra de navegación fija abajo -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:elevation="8dp"
-        android:background="@color/white"
-        android:layout_gravity="bottom">
+        android:background="@color/white">
 
         <include
             layout="@layout/menu_barra"/>
-
     </LinearLayout>
 
 </LinearLayout>

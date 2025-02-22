@@ -1,6 +1,7 @@
 package com.example.myapplication.service
 
 import android.content.Context
+import com.example.myapplication.data.Categoria
 import com.example.myapplication.data.Clientes
 import retrofit2.http.GET
 import retrofit2.converter.gson.GsonConverterFactory
@@ -18,8 +19,12 @@ data class LoginRequest(val username: String, val password: String)
 data class LoginResponse(val token: String)
 
 interface RetrofitService{
+    /* Métodos GET*/
     @GET("platos")
     suspend fun getPlatos(): List<Datos>
+
+    @GET("categorias")
+    suspend fun getCategorias(): List<Categoria>
 
     @POST("register/")
     fun registerUser(@Body request: Clientes): Call<ResponseBody>
