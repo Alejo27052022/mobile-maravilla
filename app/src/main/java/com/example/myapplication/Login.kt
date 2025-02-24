@@ -44,7 +44,7 @@ class Login : ComponentActivity() {
 
     private fun loginUser(username: String, password: String){
         val request = LoginRequest(username, password)
-        val call = RetrofitInstance.getRetrofitService(this).loginUser(request)
+        val call = RetrofitInstance.getRetrofitNoAuth().loginUser(request)
 
         call.enqueue(object: Callback<LoginResponse >{
             override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {

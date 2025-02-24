@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#101820"
-    android:gravity="center|top">
+    android:gravity="center|top"
+    android:scrollbars="vertical">
 
     <ImageView
         android:layout_width="300dp"
@@ -22,6 +23,36 @@
         android:orientation="vertical"
         android:gravity="center"
         android:layout_gravity="center">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginBottom="25dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Cédula: "
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:layout_marginEnd="25dp"
+                android:layout_weight="1" />
+
+            <EditText
+                android:id="@+id/edit_cedula"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:hint="Cédula"
+                android:inputType="text"
+                android:textColorHint="#707070"
+                android:background="@color/white"
+                android:padding="6dp"
+                android:layout_weight="1"
+                android:layout_gravity="center"/>
+
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"

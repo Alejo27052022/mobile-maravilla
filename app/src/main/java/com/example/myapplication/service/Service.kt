@@ -11,6 +11,7 @@ import com.example.myapplication.data.Datos
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.POST
@@ -20,10 +21,10 @@ data class LoginResponse(val token: String)
 
 interface RetrofitService{
     /* Métodos GET*/
-    @GET("platos")
+    @GET("platos/")
     suspend fun getPlatos(): List<Datos>
 
-    @GET("categorias")
+    @GET("categorias/")
     suspend fun getCategorias(): List<Categoria>
 
     @POST("register/")
@@ -36,18 +37,39 @@ interface RetrofitService{
 object RetrofitInstance {
     private const val BASE_URL = "https://melody19.pythonanywhere.com/api/"
 
-    fun getRetrofitService(context: Context): RetrofitService {
+    // Retrofit SIN autenticación (para registro e inicio de sesión)
+    fun getRetrofitNoAuth(): RetrofitService {
+        val client = OkHttpClient.Builder()
+            .addInterceptor(HttpLoggingInterceptor().apply {
+                level = HttpLoggingInterceptor.Level.BODY
+            })
+            .build()
+
+        val retrofit = Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(client)
+            .build()
+
+        return retrofit.create(RetrofitService::class.java)
+    }
+
+    // Retrofit CON autenticación (para endpoints protegidos)
+    fun getRetrofitAuth(context: Context): RetrofitService {
         val sharedPreferences = context.getSharedPreferences("APP_PREFS", Context.MODE_PRIVATE)
         val token = sharedPreferences.getString("TOKEN", null)
 
         val client = OkHttpClient.Builder().apply {
-            if (token != null) {
-                addInterceptor(Interceptor { chain ->
+            addInterceptor(HttpLoggingInterceptor().apply {
+                level = HttpLoggingInterceptor.Level.BODY
+            })
+            if (!token.isNullOrEmpty()) {
+                addInterceptor { chain ->
                     val request = chain.request().newBuilder()
                         .addHeader("Authorization", "Token $token")
                         .build()
                     chain.proceed(request)
-                })
+                }
             }
         }.build()
 
@@ -60,3 +82,6 @@ object RetrofitInstance {
         return retrofit.create(RetrofitService::class.java)
     }
 }
+
+
+

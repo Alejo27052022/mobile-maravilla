@@ -4,7 +4,8 @@ import com.google.gson.annotations.SerializedName
 
 data class Profile(
     val telefono: String,
-    val direccion: String
+    val direccion: String,
+    val cedula: String
 )
 
 

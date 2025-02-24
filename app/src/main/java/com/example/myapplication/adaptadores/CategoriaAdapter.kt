@@ -8,25 +8,37 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.R
 import com.example.myapplication.data.Categoria
 
-class CategoriaAdapter(private val categoria: List<Categoria>):
-        RecyclerView.Adapter<CategoriaAdapter.CategoriaViewHolder>(){
+interface OnCategoriaClickListener {
+    fun onCategoriaClick(categoria: Categoria)
+}
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoriaViewHolder {
-            val view = LayoutInflater.from(parent.context)
-                .inflate(R.layout.categoria_list, parent, false)
-            return CategoriaViewHolder(view)
-        }
+class CategoriaAdapter(
+    private val categorias: List<Categoria>,
+    private val listener: OnCategoriaClickListener
+) : RecyclerView.Adapter<CategoriaAdapter.CategoriaViewHolder>() {
 
-        override fun onBindViewHolder(holder: CategoriaViewHolder, position: Int) {
-            holder.nombre_categoriaData.text = categoria[position].nombre
-        }
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoriaViewHolder {
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.categoria_list, parent, false)
+        return CategoriaViewHolder(view)
+    }
 
-        override fun getItemCount(): Int = categoria.size
+    override fun onBindViewHolder(holder: CategoriaViewHolder, position: Int) {
+        val categoria = categorias[position]
+        holder.nombreCategoria.text = categoria.nombre
 
-
-        inner class CategoriaViewHolder(itemview: View) : RecyclerView.ViewHolder(itemview){
-            val nombre_categoriaData: TextView = itemview.findViewById(R.id.nombre_categoriaData)
+        // Capturar el clic en la categoría
+        holder.itemView.setOnClickListener {
+            listener.onCategoriaClick(categoria)
         }
     }
+
+    override fun getItemCount(): Int = categorias.size
+
+    inner class CategoriaViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val nombreCategoria: TextView = itemView.findViewById(R.id.nombre_categoriaData)
+    }
+}
+
 
 

@@ -9,5 +9,5 @@ data class Datos(
     val precio: String,
     val estado: String,
     val tiempo: Int,
-    val categoria: Int
+    val categoria: Categoria
 )

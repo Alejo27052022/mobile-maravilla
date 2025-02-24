@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -19,42 +18,41 @@
             android:layout_marginBottom="20dp"
             android:src="@drawable/maravillasinfondo"/>
 
-        <TextView
-            android:id="@+id/name_categoria"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Nombre de la Categoría"
-            android:textColor="@color/black"
-            android:textStyle="bold"
-            android:textSize="18sp" />
-
     </LinearLayout>
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="vertical"
-        android:padding="20dp">
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler_view_categoria_productos"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:scrollbars="vertical"/>
-
-    </LinearLayout>
-
-    <!-- Barra de navegación fija abajo -->
-    <LinearLayout
+        android:id="@+id/linear_layout_transf"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:elevation="8dp"
-        android:background="@color/white">
+        android:orientation="vertical"
+        android:padding="20dp"
+        android:layout_marginBottom="20dp"
+        android:background="@color/fondo1">
 
-        <include
-            layout="@layout/menu_barra"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Transferencia"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            android:textStyle="bold"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linear_layout_efectivo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp"
+        android:background="@color/fondo1">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Efectivo"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            android:textStyle="bold"/>
     </LinearLayout>
 
 </LinearLayout>

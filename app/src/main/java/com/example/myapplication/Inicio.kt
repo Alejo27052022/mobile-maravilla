@@ -1,5 +1,6 @@
 package com.example.myapplication
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.ImageView
 import android.widget.Toast
@@ -8,6 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.adaptadores.CategoriaAdapter
 import com.example.myapplication.adaptadores.MenuPlatosAdapter
+import com.example.myapplication.adaptadores.OnCategoriaClickListener
 import com.example.myapplication.data.Categoria
 import com.example.myapplication.data.Datos
 import com.example.myapplication.service.RetrofitInstance
@@ -32,7 +34,7 @@ class Inicio : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.pantalla_principal)
 
-        retrofitService = RetrofitInstance.getRetrofitService(this)
+        retrofitService = RetrofitInstance.getRetrofitAuth(this)
 
         /* Configuracion de Icono Home */
         val iconhome : ImageView = findViewById(R.id.icon_home)
@@ -43,12 +45,24 @@ class Inicio : ComponentActivity() {
         recyclerViewCategoria = findViewById(R.id.recycler_view_categoria)
 
         platosAdapter = MenuPlatosAdapter(platos)
-        categoriaAdapter = CategoriaAdapter(categoria)
-
+        categoriaAdapter = CategoriaAdapter(categoria, object : OnCategoriaClickListener {
+            override fun onCategoriaClick(categoria: Categoria) {
+                val intent = Intent(this@Inicio, PantallaCategoria::class.java)
+                intent.putExtra("CATEGORIA_ID", categoria.id)
+                intent.putExtra("CATEGORIA_NOMBRE", categoria.nombre)
+                startActivity(intent)
+            }
+        })
         recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         recyclerView.adapter = platosAdapter
         recyclerViewCategoria.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         recyclerViewCategoria.adapter = categoriaAdapter
+
+        val iconImage: ImageView = findViewById(R.id.icon_profile)
+        iconImage.setOnClickListener {
+            val intent = Intent(this, Perfil::class.java)
+            startActivity(intent)
+        }
 
         // Llamada de API
         fetchAPI()
