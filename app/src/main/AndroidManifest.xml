@@ -30,6 +30,21 @@
             android:name=".PantallaCategoria"
             android:exported="true"/>
         <activity
+            android:name=".PantallaPlato"
+            android:exported="true"/>
+        <activity
+            android:name=".PaymentMethodActivity"
+            android:exported="true"/>
+        <activity
+            android:name=".TransferPaymentActivity"
+            android:exported="true"/>
+        <activity
+            android:name=".OrderConfirmation"
+            android:exported="true"/>
+        <activity
+            android:name=".DetallePedido"
+            android:exported="true"/>
+        <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
@@ -40,6 +55,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
     </application>
 
 </manifest>

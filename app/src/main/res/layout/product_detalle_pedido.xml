@@ -12,8 +12,9 @@
         android:layout_marginEnd="20dp">
 
         <ImageView
-            android:layout_width="70dp"
-            android:layout_height="70dp"
+            android:id="@+id/imagen_plato_pedido"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:src="@drawable/icon_platofuerte"
             android:layout_marginEnd="10dp"/>
 
@@ -48,6 +49,7 @@
                     android:layout_marginEnd="10dp"/>
 
                 <TextView
+                    android:id="@+id/txt_precio"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="$150,00"
@@ -61,7 +63,7 @@
     </LinearLayout>
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="end"
@@ -80,7 +82,7 @@
             android:shape="rectangle" />
 
         <!-- Cantidad -->
-        <TextView
+        <EditText
             android:id="@+id/txt_cantidad"
             android:layout_width="40dp"
             android:layout_height="35dp"
@@ -100,6 +102,16 @@
             android:textColor="@android:color/white"
             android:layout_marginStart="8dp"
             android:shape="rectangle" />
+
     </LinearLayout>
+
+    <Button
+        android:id="@+id/btn_eliminar"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:text="Eliminar"
+        android:textColor="@android:color/white"
+        android:backgroundTint="@color/red"
+        android:layout_marginStart="8dp"/>
 
 </LinearLayout>

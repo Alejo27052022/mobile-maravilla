@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.adaptadores.CategoriaPlatoAdapter
 import com.example.myapplication.data.Datos
 import com.example.myapplication.service.RetrofitInstance
+import com.example.myapplication.service.RetrofitService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -20,11 +21,13 @@ import kotlinx.coroutines.withContext
 class PantallaCategoria : ComponentActivity() {
     private lateinit var platosAdapter: CategoriaPlatoAdapter  // Se usa el nuevo adaptador
     private val platos = mutableListOf<Datos>()
-    private val retrofitService = RetrofitInstance.getRetrofitNoAuth()
+    private lateinit var retrofitService: RetrofitService
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.pantalla_categoria)
+
+        retrofitService = RetrofitInstance.getRetrofitAuth(this)
 
         val iconhome : ImageView = findViewById(R.id.icon_home)
         iconhome.setOnClickListener {

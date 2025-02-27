@@ -3,6 +3,7 @@ package com.example.myapplication
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
@@ -48,28 +49,37 @@ class Login : ComponentActivity() {
 
         call.enqueue(object: Callback<LoginResponse >{
             override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
-                if(response.isSuccessful){
-                    val token = response.body()?.token
+                if (response.isSuccessful) {
+                    val token = response.body()?.token  // Solo obtenemos el token
 
-                    if (!token.isNullOrEmpty()){
-                        saveToken(token)
+                    // Agregar registros para depurar la respuesta
+                    Log.d("Login", "Token: $token")
+
+                    if (!token.isNullOrEmpty()) {
+                        saveToken(token)  // Guardar el token
                         Toast.makeText(this@Login, "Inicio de sesión exitoso", Toast.LENGTH_LONG).show()
+
+                        // Redirigir a la pantalla de inicio
                         startActivity(Intent(this@Login, Inicio::class.java))
                         finish()
+                    } else {
+                        Log.d("Login", "Error: El token está vacío")
+                        Toast.makeText(this@Login, "Error al obtener el token", Toast.LENGTH_LONG).show()
                     }
                 } else {
+                    Log.d("Login", "Error en la respuesta de la API: ${response.code()} - ${response.message()}")
                     Toast.makeText(this@Login, "Credenciales incorrectas", Toast.LENGTH_LONG).show()
                 }
             }
-
             override fun onFailure(p0: Call<LoginResponse>, t: Throwable) {
                 Toast.makeText(this@Login, "Error: ${t.message}", Toast.LENGTH_LONG).show()
             }
         })
     }
 
-    private fun saveToken(token: String){
+    private fun saveToken(token: String) {
         val sharedPreferences = getSharedPreferences("APP_PREFS", Context.MODE_PRIVATE)
-        sharedPreferences.edit().putString("TOKEN", token).apply()
+        sharedPreferences.edit().putString("TOKEN", token).apply()  // Guardar el token
     }
+
 }

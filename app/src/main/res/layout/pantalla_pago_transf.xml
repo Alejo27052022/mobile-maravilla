@@ -142,15 +142,26 @@
     </LinearLayout>
 
     <Button
+        android:id="@+id/upload_image_button"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:text="Subir Comprobante"
+        android:layout_marginTop="30dp"
+        android:layout_gravity="center"/>
+
+    <ImageView
+        android:id="@+id/image_view"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="10dp"/>
+
+    <Button
+        android:id="@+id/send_payment_button"
         android:layout_width="150dp"
         android:layout_height="wrap_content"
         android:text="Enviar"
         android:layout_marginTop="30dp"
         android:layout_gravity="center"/>
-
-
-
-
-
 
 </LinearLayout>

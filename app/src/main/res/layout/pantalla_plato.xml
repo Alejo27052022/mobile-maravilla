@@ -24,10 +24,14 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="20dp">
 
-        <include
-            layout="@layout/product_pantalla_plato"/>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view_plato"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="vertical"/>
 
     </LinearLayout>
 
