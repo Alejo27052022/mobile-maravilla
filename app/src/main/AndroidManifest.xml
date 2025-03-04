@@ -42,6 +42,9 @@
             android:name=".OrderConfirmation"
             android:exported="true"/>
         <activity
+            android:name=".OrderConfirmation2"
+            android:exported="true"/>
+        <activity
             android:name=".DetallePedido"
             android:exported="true"/>
         <activity

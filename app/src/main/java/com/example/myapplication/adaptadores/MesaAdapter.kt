@@ -1,20 +1,37 @@
 package com.example.myapplication.adaptadores
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.R
+import com.example.myapplication.data.Mesa
 
-class MesaAdapter(private val mesas: List<Int>, private val onMesaClick: (Int) -> Unit) : RecyclerView.Adapter<MesaAdapter.MesaViewHolder>() {
+class MesaAdapter(private val mesas: List<Mesa>, private val onMesaClick: (Mesa) -> Unit) :
+    RecyclerView.Adapter<MesaAdapter.MesaViewHolder>() {
 
     inner class MesaViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val txtNumeroMesa: TextView = view.findViewById(R.id.txtNumeroMesa)
 
-        fun bind(mesa: Int) {
-            txtNumeroMesa.text = "Mesa $mesa"
-            itemView.setOnClickListener { onMesaClick(mesa) }
+        fun bind(mesa: Mesa) {
+            txtNumeroMesa.text = mesa.numero_mesa.toString()
+
+            // Cambiar el fondo según el estado de la mesa
+            if (mesa.estado_mesa == "disponible") {
+                txtNumeroMesa.setBackgroundResource(R.drawable.fondo_green)
+                itemView.isEnabled = true // Habilitar la vista si la mesa está disponible
+            } else if (mesa.estado_mesa == "ocupada") {
+                txtNumeroMesa.setBackgroundResource(R.drawable.fondo_red)
+                itemView.isEnabled = false // Deshabilitar la vista si la mesa está ocupada
+            }
+
+            itemView.setOnClickListener {
+                if (itemView.isEnabled) { // Verificar si la vista está habilitada antes de llamar a onMesaClick
+                    onMesaClick(mesa)
+                }
+            }
         }
     }
 

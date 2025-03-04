@@ -9,9 +9,11 @@ import retrofit2.Retrofit
 import com.example.myapplication.data.Datos
 import com.example.myapplication.data.DetallePedido
 import com.example.myapplication.data.Mesa
+import com.example.myapplication.data.MisDetallePedidos
 import com.example.myapplication.data.MisPedidos
 import com.example.myapplication.data.Pago
 import com.example.myapplication.data.PagoRequest
+import com.example.myapplication.data.PedidoRequest
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody
@@ -37,6 +39,12 @@ interface RetrofitService {
     @GET("platos/{id}/")
     suspend fun getPlatoById(@Path("id") id: Int): Datos
 
+    @GET("mesas/")
+    suspend fun getMesas(): List<Mesa>
+
+    @GET("mesas/{id}/")
+    suspend fun getMesaById(@Path("id") id: Int): Mesa
+
     @GET("me/")
     suspend fun getUserProfile(): Clientes
 
@@ -46,6 +54,9 @@ interface RetrofitService {
     @GET("mis-pedidos/")
     fun obtenerMisPedidos(): Call<List<MisPedidos>>
 
+    @GET("mis-detallepedidos/")
+    fun obtenerMisDetallePedidos(): Call<List<MisDetallePedidos>>
+
     @POST("register/")
     fun registerUser(@Body request: Clientes): Call<ResponseBody>
 
@@ -54,7 +65,7 @@ interface RetrofitService {
 
     // Reservar mesa (crear pedido)
     @POST("pedidos/")
-    fun crearPedido(@Body pedido: Mesa): Call<Mesa>
+    suspend fun crearPedido(@Body pedido: PedidoRequest): Response<Mesa>
 
     // Agregar detalles del pedido
     @POST("detallepedidos/")

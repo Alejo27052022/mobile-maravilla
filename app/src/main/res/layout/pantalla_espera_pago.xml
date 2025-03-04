@@ -9,7 +9,7 @@
     <ImageView
         android:layout_width="150dp"
         android:layout_height="150dp"
-        android:src="@drawable/wait_icon"
+        android:src="@drawable/check_icon"
         android:layout_marginBottom="30dp"/>
 
     <TextView
@@ -18,7 +18,7 @@
         android:textColor="@color/black"
         android:textStyle="italic"
         android:textSize="18sp"
-        android:text="Espere que el administrador revise que su pago se ha realizado correctamente"
+        android:text="¡Ha realizado el pedido correctamente, no se olvide de acercarse a pagar!"
         android:textAlignment="center"
         android:padding="20dp"/>
 </LinearLayout>

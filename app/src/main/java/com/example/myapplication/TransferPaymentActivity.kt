@@ -19,6 +19,7 @@ import com.example.myapplication.data.DetallePedido
 import com.example.myapplication.data.MisPedidos
 import com.example.myapplication.data.Pago
 import com.example.myapplication.data.PagoRequest
+import com.example.myapplication.data.PedidoRequest
 import com.example.myapplication.service.RetrofitInstance
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -49,11 +50,10 @@ class TransferPaymentActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.pantalla_pago_transf)
 
-        mesaSeleccionada = getSharedPreferences("PedidoPrefs", Context.MODE_PRIVATE).getInt("mesaSeleccionada", 0)
         carrito = getCarritoFromSharedPreferences()
 
         val uploadButton = findViewById<Button>(R.id.upload_image_button)
-        val sendButton = findViewById<Button>(R.id.send_payment_button)
+        sendButton = findViewById(R.id.send_payment_button)
         val imageView = findViewById<ImageView>(R.id.image_view)
 
         uploadButton.setOnClickListener {
@@ -61,8 +61,13 @@ class TransferPaymentActivity : AppCompatActivity() {
             startActivityForResult(intent, PICK_IMAGE_REQUEST)
         }
 
+        val sharedPreferences = getSharedPreferences("PedidoPrefs", Context.MODE_PRIVATE)
+        mesaSeleccionada = sharedPreferences.getInt("mesaSeleccionada", 0) // Recupera el número de mesa como Int
+
+        Log.d("onCreate", "mesaSeleccionada: $mesaSeleccionada")
+
         sendButton.setOnClickListener {
-            sendButton.isEnabled = false // Desactivar el botón
+            sendButton.isEnabled = false
             Log.d("TransferPaymentActivity", "mesaSeleccionada: $mesaSeleccionada")
             Log.d("TransferPaymentActivity", "carrito: $carrito")
             enviarPedido()
@@ -86,138 +91,112 @@ class TransferPaymentActivity : AppCompatActivity() {
 
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                // 1. Crear el pedido
-                RetrofitInstance.getRetrofitAuth(this@TransferPaymentActivity).crearPedido(Mesa(mesa = mesaSeleccionada!!)).enqueue(object : Callback<Mesa> {
-                    override fun onResponse(call: Call<Mesa>, response: Response<Mesa>) {
-                        if (response.isSuccessful) {
-                            // 2. Obtener el id del pedido desde mis-pedidos
-                            RetrofitInstance.getRetrofitAuth(this@TransferPaymentActivity).obtenerMisPedidos().enqueue(object : Callback<List<MisPedidos>> {
-                                override fun onResponse(call: Call<List<MisPedidos>>, response: Response<List<MisPedidos>>) {
-                                    if (response.isSuccessful) {
-                                        val pedidos = response.body() ?: emptyList()
-                                        val pedidoReciente = pedidos.lastOrNull { pedido: MisPedidos -> pedido.mesa == mesaSeleccionada }
+                val pedidoRequest = PedidoRequest(mesa = mesaSeleccionada!!)
+                val response = RetrofitInstance.getRetrofitAuth(this@TransferPaymentActivity).crearPedido(pedidoRequest)
 
-                                        val pedidoId = pedidoReciente?.id ?: run {
-                                            Log.e("TransferPaymentActivity", "Error al obtener pedidoId de mis-pedidos")
-                                            lifecycleScope.launch(Dispatchers.Main) {
-                                                Toast.makeText(this@TransferPaymentActivity, "Error al obtener el ID del pedido", Toast.LENGTH_SHORT).show()
-                                            }
-                                            return
-                                        }
+                withContext(Dispatchers.Main) {
+                    if (response.isSuccessful) {
+                        RetrofitInstance.getRetrofitAuth(this@TransferPaymentActivity).obtenerMisPedidos().enqueue(object : retrofit2.Callback<List<MisPedidos>> {
+                            override fun onResponse(call: retrofit2.Call<List<MisPedidos>>, response: retrofit2.Response<List<MisPedidos>>) {
+                                if (response.isSuccessful) {
+                                    val pedidos = response.body() ?: emptyList()
+                                    val pedidoReciente = pedidos.lastOrNull { pedido: MisPedidos -> pedido.mesa == mesaSeleccionada }
 
-                                        // 3. Crear los detallepedidos
-                                        carrito.forEach { detalle ->
-                                            RetrofitInstance.getRetrofitAuth(this@TransferPaymentActivity).agregarDetallePedido(DetallePedido(cantidad = detalle.cantidad, precio_total = detalle.precio_total, pedido = pedidoId, plato = detalle.plato)).enqueue(object : Callback<DetallePedido> {
-                                                override fun onResponse(call: Call<DetallePedido>, response: Response<DetallePedido>) {
-                                                    if (!response.isSuccessful) {
-                                                        lifecycleScope.launch(Dispatchers.Main) {
-                                                            Toast.makeText(this@TransferPaymentActivity, "Error al agregar detalle", Toast.LENGTH_SHORT).show()
-                                                        }
-                                                        return
-                                                    }
-                                                }
+                                    val pedidoId = pedidoReciente?.id ?: run {
+                                        Log.e("TransferPaymentActivity", "Error al obtener pedidoId de mis-pedidos")
+                                        Toast.makeText(this@TransferPaymentActivity, "Error al obtener el ID del pedido", Toast.LENGTH_SHORT).show()
+                                        sendButton.isEnabled = true
+                                        return
+                                    }
 
-                                                override fun onFailure(call: Call<DetallePedido>, t: Throwable) {
-                                                    lifecycleScope.launch(Dispatchers.Main) {
-                                                        Toast.makeText(this@TransferPaymentActivity, "Error al agregar detalle: ${t.message}", Toast.LENGTH_SHORT).show()
-                                                    }
+                                    carrito.forEach { detalle ->
+                                        RetrofitInstance.getRetrofitAuth(this@TransferPaymentActivity).agregarDetallePedido(DetallePedido(cantidad = detalle.cantidad, precio_total = detalle.precio_total, pedido = pedidoId, plato = detalle.plato)).enqueue(object : retrofit2.Callback<DetallePedido> {
+                                            override fun onResponse(call: retrofit2.Call<DetallePedido>, response: retrofit2.Response<DetallePedido>) {
+                                                if (!response.isSuccessful) {
+                                                    Log.e("TransferPaymentActivity", "Error al agregar detalle: ${response.errorBody()?.string()}")
+                                                    Toast.makeText(this@TransferPaymentActivity, "Error al agregar detalle", Toast.LENGTH_SHORT).show()
+                                                    sendButton.isEnabled = true
                                                     return
                                                 }
-                                            })
-                                        }
-
-                                        // 4. Enviar el pago (datos JSON) CON EL COMPROBANTE
-                                        val pagoRequest = PagoRequest(metodo_pago = "transferencia", estado_pago = "pendiente", pedido = pedidoId)
-
-                                        val metodoPago = pagoRequest.metodo_pago?.toRequestBody("text/plain".toMediaTypeOrNull())
-                                        val estadoPago = pagoRequest.estado_pago?.toRequestBody("text/plain".toMediaTypeOrNull())
-                                        val pedido = pagoRequest.pedido?.toString()?.toRequestBody("text/plain".toMediaTypeOrNull())
-
-                                        // Obtener el comprobante como MultipartBody.Part
-                                        val imageFile = imageUri?.let { uriToFile(it) }
-                                        val requestFile = imageFile?.asRequestBody("image/*".toMediaTypeOrNull())
-                                        val comprobantePago = requestFile?.let { MultipartBody.Part.createFormData("comprobante_pago", imageFile.name, it) }
-
-                                        RetrofitInstance.getRetrofitAuth(this@TransferPaymentActivity).enviarPago(metodoPago!!, estadoPago!!, pedido!!, comprobantePago).enqueue(object : Callback<Pago> {
-                                            override fun onResponse(call: Call<Pago>, response: Response<Pago>) {
-                                                if (response.isSuccessful) {
-                                                    lifecycleScope.launch(Dispatchers.Main) {
-                                                        Toast.makeText(this@TransferPaymentActivity, "Pedido confirmado", Toast.LENGTH_SHORT).show()
-
-                                                        // Crear y mostrar el AlertDialog
-                                                        val builder = AlertDialog.Builder(this@TransferPaymentActivity)
-                                                        val inflater = layoutInflater
-                                                        val dialogView = inflater.inflate(R.layout.pantalla_confirmacion_pago, null)
-                                                        builder.setView(dialogView)
-
-                                                        // Modificar el botón "Aceptar" para redireccionar a la pantalla de inicio
-                                                        builder.setPositiveButton("Aceptar") { dialog, _ ->
-                                                            dialog.dismiss()
-                                                            // Limpiar el carrito
-                                                            limpiarCarrito()
-                                                            // Redireccionar a la pantalla de inicio
-                                                            val intent = Intent(this@TransferPaymentActivity, Inicio::class.java) // Reemplaza MainActivity con tu pantalla de inicio
-                                                            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                                                            startActivity(intent)
-                                                        }
-
-                                                        val dialog = builder.create()
-                                                        dialog.show()
-                                                    }
-                                                } else {
-                                                    lifecycleScope.launch(Dispatchers.Main) {
-                                                        Toast.makeText(this@TransferPaymentActivity, "Error al enviar pago", Toast.LENGTH_SHORT).show()
-                                                    }
-                                                }
                                             }
 
-                                            override fun onFailure(call: Call<Pago>, t: Throwable) {
-                                                lifecycleScope.launch(Dispatchers.Main) {
-                                                    Toast.makeText(this@TransferPaymentActivity, "Error al enviar pago: ${t.message}", Toast.LENGTH_SHORT).show()
-                                                }
+                                            override fun onFailure(call: retrofit2.Call<DetallePedido>, t: Throwable) {
+                                                Log.e("TransferPaymentActivity", "Error al agregar detalle: ${t.message}", t)
+                                                Toast.makeText(this@TransferPaymentActivity, "Error al agregar detalle: ${t.message}", Toast.LENGTH_SHORT).show()
+                                                sendButton.isEnabled = true
+                                                return
                                             }
                                         })
-                                    } else {
-                                        lifecycleScope.launch(Dispatchers.Main) {
-                                            Toast.makeText(this@TransferPaymentActivity, "Error al obtener mis pedidos", Toast.LENGTH_SHORT).show()
+                                    }
+
+                                    val pagoRequest = PagoRequest(metodo_pago = "transferencia", estado_pago = "pendiente", pedido = pedidoId)
+                                    val metodoPago = pagoRequest.metodo_pago?.toRequestBody("text/plain".toMediaTypeOrNull())
+                                    val estadoPago = pagoRequest.estado_pago?.toRequestBody("text/plain".toMediaTypeOrNull())
+                                    val pedido = pagoRequest.pedido?.toString()?.toRequestBody("text/plain".toMediaTypeOrNull())
+
+                                    val imageFile = imageUri?.let { uriToFile(it) }
+                                    val requestFile = imageFile?.asRequestBody("image/*".toMediaTypeOrNull())
+                                    val comprobantePago = requestFile?.let { MultipartBody.Part.createFormData("comprobante_pago", imageFile.name, it) }
+
+                                    RetrofitInstance.getRetrofitAuth(this@TransferPaymentActivity).enviarPago(metodoPago!!, estadoPago!!, pedido!!, comprobantePago).enqueue(object : retrofit2.Callback<Pago> {
+                                        override fun onResponse(call: retrofit2.Call<Pago>, response: retrofit2.Response<Pago>) {
+                                            if (response.isSuccessful) {
+                                                Toast.makeText(this@TransferPaymentActivity, "Pedido confirmado", Toast.LENGTH_SHORT).show()
+                                                val builder = AlertDialog.Builder(this@TransferPaymentActivity)
+                                                val inflater = layoutInflater
+                                                val dialogView = inflater.inflate(R.layout.pantalla_confirmacion_pago, null)
+                                                builder.setView(dialogView)
+                                                builder.setPositiveButton("Aceptar") { dialog, _ ->
+                                                    dialog.dismiss()
+                                                    limpiarCarrito()
+                                                    val intent = Intent(this@TransferPaymentActivity, Inicio::class.java)
+                                                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                                    startActivity(intent)
+                                                }
+
+                                                val dialog = builder.create()
+                                                dialog.show()
+                                            } else {
+                                                Toast.makeText(this@TransferPaymentActivity, "Error al enviar pago", Toast.LENGTH_SHORT).show()
+                                                sendButton.isEnabled = true
+                                            }
                                         }
-                                    }
-                                }
 
-                                override fun onFailure(call: Call<List<MisPedidos>>, t: Throwable) {
-                                    lifecycleScope.launch(Dispatchers.Main) {
-                                        Toast.makeText(this@TransferPaymentActivity, "Error al obtener mis pedidos: ${t.message}", Toast.LENGTH_SHORT).show()
-                                    }
+                                        override fun onFailure(call: retrofit2.Call<Pago>, t: Throwable) {
+                                            Toast.makeText(this@TransferPaymentActivity, "Error al enviar pago: ${t.message}", Toast.LENGTH_SHORT).show()
+                                            sendButton.isEnabled = true
+                                        }
+                                    })
+                                } else {
+                                    Toast.makeText(this@TransferPaymentActivity, "Error al obtener mis pedidos", Toast.LENGTH_SHORT).show()
+                                    sendButton.isEnabled = true
                                 }
-                            })
-                        } else {
-                            lifecycleScope.launch(Dispatchers.Main) {
-                                Toast.makeText(this@TransferPaymentActivity, "Error al crear el pedido", Toast.LENGTH_SHORT).show()
                             }
-                        }
-                    }
 
-                    override fun onFailure(call: Call<Mesa>, t: Throwable) {
-                        lifecycleScope.launch(Dispatchers.Main) {
-                            Toast.makeText(this@TransferPaymentActivity, "Error al crear el pedido: ${t.message}", Toast.LENGTH_SHORT).show()
-                        }
+                            override fun onFailure(call: retrofit2.Call<List<MisPedidos>>, t: Throwable) {
+                                Toast.makeText(this@TransferPaymentActivity, "Error al obtener mis pedidos: ${t.message}", Toast.LENGTH_SHORT).show()
+                                sendButton.isEnabled = true
+                            }
+                        })
+                    } else {
+                        Toast.makeText(this@TransferPaymentActivity, "Error al crear el pedido: ${response.errorBody()?.string()}", Toast.LENGTH_LONG).show()
+                        sendButton.isEnabled = true
                     }
-                })
+                }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     Toast.makeText(this@TransferPaymentActivity, "Error de conexión: ${e.message}", Toast.LENGTH_SHORT).show()
+                    sendButton.isEnabled = true
                 }
             }
         }
     }
 
     private fun limpiarCarrito() {
-        carrito.clear() // Vacía la lista del carrito
-
-        // Limpia los datos del carrito en SharedPreferences
+        carrito.clear()
         val sharedPreferences: SharedPreferences = getSharedPreferences("CarritoPrefs", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
-        editor.clear() // Elimina todos los datos del carrito en SharedPreferences
+        editor.clear()
         editor.apply()
     }
 
@@ -238,5 +217,19 @@ class TransferPaymentActivity : AppCompatActivity() {
             return gson.fromJson(carritoJson, type)
         }
         return mutableListOf()
+    }
+
+    private fun getMesaFromSharedPreferences(): Mesa? {
+        val sharedPreferences = getSharedPreferences("PedidoPrefs", Context.MODE_PRIVATE)
+        val mesaJson = sharedPreferences.getString("mesaSeleccionada", null)
+        Log.d("getMesaFromSharedPreferences", "mesaJson: $mesaJson") // Imprimir mesaJson
+
+        if (mesaJson != null) {
+            val gson = Gson()
+            val mesa = gson.fromJson(mesaJson, Mesa::class.java)
+            Log.d("getMesaFromSharedPreferences", "mesa: $mesa") // Imprimir objeto Mesa
+            return mesa
+        }
+        return null
     }
 }

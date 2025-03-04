@@ -54,19 +54,21 @@ class CarritoViewModel(application: Application) : AndroidViewModel(application)
     }
 
     fun actualizarCantidad(position: Int, cantidad: Int) {
-        val listaActualizada = _carrito.value?.toMutableList() ?: return
-        if (position in 0 until listaActualizada.size) {
-            val detalle = listaActualizada[position]
-            val precioUnitario = obtenerPrecioUnitario(detalle.plato)
+        viewModelScope.launch {
+            val listaActualizada = _carrito.value?.toMutableList() ?: return@launch
+            if (position in 0 until listaActualizada.size) {
+                val detalle = listaActualizada[position]
+                val precioUnitario = obtenerPrecioUnitario(detalle.plato)
 
-            if (precioUnitario != null) {
-                detalle.cantidad = cantidad
-                detalle.precio_total = precioUnitario * cantidad
-                _carrito.value = listaActualizada
-                guardarCarrito()
-                actualizarPrecioTotal()
-            } else {
-                Log.e("CarritoViewModel", "Precio unitario no encontrado para el plato ${detalle.plato}")
+                if (precioUnitario != null) {
+                    detalle.cantidad = cantidad
+                    detalle.precio_total = precioUnitario * cantidad
+                    _carrito.value = listaActualizada
+                    guardarCarrito()
+                    actualizarPrecioTotal()
+                } else {
+                    Log.e("CarritoViewModel", "Precio unitario no encontrado para el plato ${detalle.plato}")
+                }
             }
         }
     }
@@ -75,8 +77,8 @@ class CarritoViewModel(application: Application) : AndroidViewModel(application)
         return platoNombres
     }
 
-    private fun obtenerPrecioUnitario(platoId: Int): Double? = runBlocking {
-        try {
+    private suspend fun obtenerPrecioUnitario(platoId: Int): Double? {
+        return try {
             val plato = RetrofitInstance.getRetrofitAuth(getApplication()).getPlatoById(platoId)
             plato.precio
         } catch (e: Exception) {

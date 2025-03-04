@@ -18,8 +18,11 @@ import com.example.myapplication.adaptadores.CarritoAdapter
 import com.example.myapplication.adaptadores.MesaAdapter
 import com.example.myapplication.data.DetallePedido
 import com.example.myapplication.data.Mesa
+import com.example.myapplication.data.MisPedidos
+import com.example.myapplication.data.PedidoRequest
 import com.example.myapplication.service.RetrofitInstance
 import com.example.myapplication.viewmodel.CarritoViewModel
+import com.example.myapplication.viewmodel.MesaViewModel
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -28,11 +31,13 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
+
 class DetallePedido : AppCompatActivity() {
     private lateinit var carritoViewModel: CarritoViewModel
+    private lateinit var mesaViewModel: MesaViewModel
     private lateinit var adapter: CarritoAdapter
     private lateinit var mesaAdapter: MesaAdapter
-    private var mesaSeleccionada: Int? = null
+    private var mesaSeleccionada: Mesa? = null
     private lateinit var txtCantidad: EditText
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,6 +46,7 @@ class DetallePedido : AppCompatActivity() {
 
         txtCantidad = findViewById(R.id.txt_cantidad)
         carritoViewModel = ViewModelProvider(this).get(CarritoViewModel::class.java)
+        mesaViewModel = ViewModelProvider(this).get(MesaViewModel::class.java)
 
         adapter = CarritoAdapter(mutableListOf(), carritoViewModel, RetrofitInstance.getRetrofitAuth(this@DetallePedido), this)
         findViewById<RecyclerView>(R.id.recyclerviewPlatos).apply {
@@ -60,12 +66,21 @@ class DetallePedido : AppCompatActivity() {
         val recyclerViewMesas: RecyclerView = findViewById(R.id.recyclerViewMesas)
         recyclerViewMesas.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
 
-        val mesasDisponibles = (1..10).toList()
-        mesaAdapter = MesaAdapter(mesasDisponibles) { mesa ->
+        mesaAdapter = MesaAdapter(emptyList()) { mesa ->
             mesaSeleccionada = mesa
-            Toast.makeText(this, "Mesa seleccionada: $mesa", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Mesa seleccionada: ${mesa.numero_mesa}", Toast.LENGTH_SHORT).show()
         }
         recyclerViewMesas.adapter = mesaAdapter
+
+        mesaViewModel.mesas.observe(this) { mesas ->
+            mesaAdapter = MesaAdapter(mesas) { mesa ->
+                mesaSeleccionada = mesa
+                Toast.makeText(this, "Mesa seleccionada: ${mesa.numero_mesa}", Toast.LENGTH_SHORT).show()
+            }
+            recyclerViewMesas.adapter = mesaAdapter
+        }
+
+        mesaViewModel.obtenerMesas()
 
         findViewById<Button>(R.id.btn_pagar).setOnClickListener {
             if (mesaSeleccionada == null) {
@@ -73,10 +88,12 @@ class DetallePedido : AppCompatActivity() {
                 return@setOnClickListener
             }
 
+            val gson = Gson() // Inicializa Gson
             val sharedPreferences = getSharedPreferences("PedidoPrefs", Context.MODE_PRIVATE)
             val editor = sharedPreferences.edit()
-            editor.putInt("mesaSeleccionada", mesaSeleccionada!!)
-            val gson = Gson()
+            val numeroMesa = mesaSeleccionada!!.numero_mesa // Obtén el número de mesa
+            Log.d("DetallePedido", "Mesa a guardar: $numeroMesa") // Imprimir numeroMesa
+            editor.putInt("mesaSeleccionada", numeroMesa) // Guarda el número de mesa como Int
             val carritoJson = gson.toJson(carritoViewModel.carrito.value)
             editor.putString("carrito", carritoJson)
             editor.apply()
@@ -98,68 +115,90 @@ class DetallePedido : AppCompatActivity() {
         }
     }
 
-    private fun enviarPedido() {
-        val mesaNumero = mesaSeleccionada ?: run {
+    private suspend fun enviarPedido() {
+        val mesaNumero = mesaSeleccionada?.numero_mesa ?: run {
             Toast.makeText(this, "Por favor, selecciona una mesa", Toast.LENGTH_SHORT).show()
             return
         }
 
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                RetrofitInstance.getRetrofitAuth(this@DetallePedido).crearPedido(Mesa(mesa = mesaNumero)).enqueue(object : Callback<Mesa> {
-                    override fun onResponse(call: Call<Mesa>, response: Response<Mesa>) {
-                        if (response.isSuccessful) {
-                            val pedidoId = response.body()?.id ?: return
+                val pedidoRequest = PedidoRequest(
+                    mesa = mesaNumero
+                )
 
-                            carritoViewModel.carrito.value?.forEach { detalle ->
-                                val cantidad = txtCantidad.text.toString().toIntOrNull() ?: 1
-                                val detallePedido = DetallePedido(
-                                    cantidad = cantidad,
-                                    precio_total = detalle.precio_total,
-                                    pedido = pedidoId,
-                                    plato = detalle.plato
-                                )
+                val response = RetrofitInstance.getRetrofitAuth(this@DetallePedido).crearPedido(pedidoRequest)
 
-                                RetrofitInstance.getRetrofitAuth(this@DetallePedido).agregarDetallePedido(detallePedido).enqueue(object : Callback<DetallePedido> {
-                                    override fun onResponse(call: Call<DetallePedido>, response: Response<DetallePedido>) {
-                                        if (!response.isSuccessful) {
-                                            lifecycleScope.launch(Dispatchers.Main) {
-                                                Toast.makeText(this@DetallePedido, "Error al agregar detalle", Toast.LENGTH_SHORT).show()
-                                            }
-                                            return
-                                        }
-                                    }
+                withContext(Dispatchers.Main) {
+                    if (response.isSuccessful) {
+                        RetrofitInstance.getRetrofitAuth(this@DetallePedido).obtenerMisPedidos().enqueue(object : retrofit2.Callback<List<MisPedidos>> {
+                            override fun onResponse(call: retrofit2.Call<List<MisPedidos>>, response: retrofit2.Response<List<MisPedidos>>) {
+                                if (response.isSuccessful) {
+                                    val pedidos = response.body() ?: emptyList()
+                                    val pedidoReciente = pedidos.lastOrNull { pedido: MisPedidos -> pedido.mesa == mesaNumero }
 
-                                    override fun onFailure(call: Call<DetallePedido>, t: Throwable) {
-                                        lifecycleScope.launch(Dispatchers.Main) {
-                                            Toast.makeText(this@DetallePedido, "Error al agregar detalle: ${t.message}", Toast.LENGTH_SHORT).show()
-                                        }
+                                    val pedidoId = pedidoReciente?.id ?: run {
+                                        Log.e("DetallePedido", "Error al obtener pedidoId de mis-pedidos")
+                                        Toast.makeText(this@DetallePedido, "Error al obtener el ID del pedido", Toast.LENGTH_SHORT).show()
                                         return
                                     }
-                                })
+
+                                    Log.d("DetallePedido", "ID del pedido obtenido: $pedidoId") // Log adicional
+
+                                    carritoViewModel.carrito.value?.forEach { detalle ->
+                                        val cantidad = txtCantidad.text.toString().toIntOrNull() ?: 1
+                                        val detallePedido = DetallePedido(
+                                            cantidad = cantidad,
+                                            precio_total = detalle.precio_total,
+                                            pedido = pedidoId,
+                                            plato = detalle.plato
+                                        )
+
+                                        Log.d("DetallePedido", "DetallePedido a enviar: $detallePedido") // Log adicional
+
+                                        // Log justo antes de la llamada a agregarDetallePedido()
+                                        Log.d("DetallePedido", "Llamando a agregarDetallePedido con: $detallePedido")
+
+                                        RetrofitInstance.getRetrofitAuth(this@DetallePedido).agregarDetallePedido(detallePedido).enqueue(object : retrofit2.Callback<DetallePedido> {
+                                            override fun onResponse(call: retrofit2.Call<DetallePedido>, response: retrofit2.Response<DetallePedido>) {
+                                                Log.d("DetallePedido", "Respuesta de agregarDetallePedido: ${response.code()}")
+                                                if (response.isSuccessful) {
+                                                    Log.d("DetallePedido", "DetallePedido enviado correctamente: ${response.body()}")
+                                                } else {
+                                                    Log.e("DetallePedido", "Error al agregar detalle: ${response.errorBody()?.string()}")
+                                                    Toast.makeText(this@DetallePedido, "Error al agregar detalle", Toast.LENGTH_SHORT).show()
+                                                }
+                                            }
+
+                                            override fun onFailure(call: retrofit2.Call<DetallePedido>, t: Throwable) {
+                                                Log.e("DetallePedido", "Error al agregar detalle: ${t.message}", t)
+                                                Toast.makeText(this@DetallePedido, "Error al agregar detalle: ${t.message}", Toast.LENGTH_SHORT).show()
+                                            }
+                                        })
+                                    }
+
+                                    Toast.makeText(this@DetallePedido, "Pedido confirmado", Toast.LENGTH_SHORT).show()
+                                    carritoViewModel.vaciarCarrito()
+                                    finish()
+                                } else {
+                                    Log.e("DetallePedido", "Error al obtener mis pedidos: ${response.errorBody()?.string()}")
+                                    Toast.makeText(this@DetallePedido, "Error al obtener mis pedidos", Toast.LENGTH_SHORT).show()
+                                }
                             }
 
-                            lifecycleScope.launch(Dispatchers.Main) {
-                                Toast.makeText(this@DetallePedido, "Pedido confirmado", Toast.LENGTH_SHORT).show()
-                                carritoViewModel.vaciarCarrito()
-                                finish()
+                            override fun onFailure(call: retrofit2.Call<List<MisPedidos>>, t: Throwable) {
+                                Log.e("DetallePedido", "Error al obtener mis pedidos: ${t.message}", t)
+                                Toast.makeText(this@DetallePedido, "Error al obtener mis pedidos: ${t.message}", Toast.LENGTH_SHORT).show()
                             }
-                        } else {
-                            lifecycleScope.launch(Dispatchers.Main) {
-                                Toast.makeText(this@DetallePedido, "Error al crear el pedido", Toast.LENGTH_SHORT).show()
-                            }
-                        }
+                        })
+                    } else {
+                        Toast.makeText(this@DetallePedido, "Error al crear el pedido: ${response.errorBody()?.string()}", Toast.LENGTH_LONG).show()
                     }
-
-                    override fun onFailure(call: Call<Mesa>, t: Throwable) {
-                        lifecycleScope.launch(Dispatchers.Main) {
-                            Toast.makeText(this@DetallePedido, "Error al crear el pedido: ${t.message}", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                })
+                }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(this@DetallePedido, "Error de conexión", Toast.LENGTH_SHORT).show()
+                    Log.e("DetallePedido", "Error de conexión general: ${e.message}", e)
+                    Toast.makeText(this@DetallePedido, "Error de conexión: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
             }
         }
