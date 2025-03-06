@@ -29,6 +29,13 @@ class PantallaCategoria : ComponentActivity() {
 
         retrofitService = RetrofitInstance.getRetrofitAuth(this)
 
+        val iconCarrito: ImageView = findViewById(R.id.icon_buy)
+        iconCarrito.setOnClickListener {
+            Log.d("PantallaPlato", "Icono de carrito clickeado")
+            val intent = Intent(this, com.example.myapplication.DetallePedido::class.java)
+            startActivity(intent)
+        }
+
         val iconhome : ImageView = findViewById(R.id.icon_home)
         iconhome.setOnClickListener {
             val intent = Intent(this, Inicio::class.java)
@@ -50,7 +57,7 @@ class PantallaCategoria : ComponentActivity() {
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         // Aquí inicializamos `CategoriaPlatoAdapter` en lugar de `MenuPlatosAdapter`
-        platosAdapter = CategoriaPlatoAdapter(platos)
+        platosAdapter = CategoriaPlatoAdapter(platos, this)
         recyclerView.adapter = platosAdapter
 
         if (categoriaId != -1) {
