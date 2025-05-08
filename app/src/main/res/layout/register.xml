@@ -1,293 +1,374 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#101820"
-    android:gravity="center|top"
     android:scrollbars="vertical">
 
-    <ImageView
-        android:layout_width="300dp"
-        android:layout_height="120dp"
-        android:layout_gravity="center|top"
-        android:layout_marginTop="40dp"
-        android:layout_marginBottom="50dp"
-        android:adjustViewBounds="true"
-        android:src="@drawable/portada2" />
 
-    <LinearLayout
-        android:layout_width="wrap_content"
+    <TextView
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:layout_gravity="center">
+        android:paddingStart="25dp"
+        android:paddingEnd="25dp"
+        android:text="¡Únete a nosotros y comienza a disfrutar de tus platos favoritos!"
+        android:textColor="@color/white"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/constraintLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.204"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.363" />
 
-        <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/border_white_puntas"
+        android:paddingLeft="20dp"
+        android:paddingTop="20dp"
+        android:paddingRight="20dp"
+        android:paddingBottom="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <TextView
+            android:id="@+id/textView2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:text="Register"
+            android:textAllCaps="false"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0" />
+
+        <LinearLayout
+            android:id="@+id/linearlayout1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
             android:gravity="center"
-            android:layout_marginBottom="25dp">
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView2"
+            app:layout_constraintVertical_bias="0.0">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Cédula: "
-                android:textColor="@color/white"
+                android:layout_marginEnd="20dp"
+                android:text="Cédula:"
+                android:textColor="@color/black"
                 android:textSize="16sp"
-                android:layout_marginEnd="25dp"
-                android:layout_weight="1" />
+                android:textStyle="bold" />
 
             <EditText
                 android:id="@+id/edit_cedula"
-                android:layout_width="200dp"
+                android:layout_width="40mm"
                 android:layout_height="wrap_content"
-                android:hint="Cédula"
-                android:inputType="text"
-                android:textColorHint="#707070"
-                android:background="@color/white"
-                android:padding="6dp"
-                android:layout_weight="1"
-                android:layout_gravity="center"/>
+                android:background="@drawable/border_textview"
+                android:hint="Número de Cédula"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textStyle="italic" />
 
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/linearlayout2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:layout_marginTop="30dp"
             android:gravity="center"
-            android:layout_marginBottom="25dp">
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/linearlayout1"
+            app:layout_constraintVertical_bias="0.0">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Nombre: "
-                android:textColor="@color/white"
+                android:layout_marginEnd="20dp"
+                android:text="Nombre:"
+                android:textColor="@color/black"
                 android:textSize="16sp"
-                android:layout_marginEnd="25dp"
-                android:layout_weight="1" />
+                android:textStyle="bold" />
 
             <EditText
                 android:id="@+id/edit_name"
-                android:layout_width="200dp"
+                android:layout_width="40mm"
                 android:layout_height="wrap_content"
+                android:background="@drawable/border_textview"
                 android:hint="Nombre"
-                android:inputType="text"
-                android:textColorHint="#707070"
-                android:background="@color/white"
-                android:padding="6dp"
-                android:layout_weight="1"
-                android:layout_gravity="center"/>
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textStyle="italic" />
 
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/linearlayout3"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:layout_marginTop="30dp"
             android:gravity="center"
-            android:layout_marginBottom="25dp">
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/linearlayout2"
+            app:layout_constraintVertical_bias="0.0">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Apellido:"
-                android:textColor="@color/white"
+                android:layout_marginEnd="20dp"
+                android:text="Apellido"
+                android:textColor="@color/black"
                 android:textSize="16sp"
-                android:layout_marginEnd="25dp"
-                android:layout_weight="1" />
+                android:textStyle="bold" />
 
             <EditText
                 android:id="@+id/edit_last"
-                android:layout_width="200dp"
+                android:layout_width="40mm"
                 android:layout_height="wrap_content"
+                android:background="@drawable/border_textview"
                 android:hint="Apellido"
-                android:inputType="text"
-                android:textColorHint="#707070"
-                android:background="@color/white"
-                android:padding="6dp"
-                android:layout_weight="1"
-                android:layout_gravity="center"/>
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textStyle="italic" />
 
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/linearlayout4"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:layout_marginTop="30dp"
             android:gravity="center"
-            android:layout_marginBottom="25dp">
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/linearlayout3"
+            app:layout_constraintVertical_bias="0.0">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Usuario:"
-                android:textColor="@color/white"
+                android:layout_marginEnd="20dp"
+                android:text="Usuario"
+                android:textColor="@color/black"
                 android:textSize="16sp"
-                android:layout_weight="1"
-                android:layout_marginEnd="25dp" />
+                android:textStyle="bold" />
 
             <EditText
                 android:id="@+id/input_usuario"
-                android:layout_width="200dp"
+                android:layout_width="40mm"
                 android:layout_height="wrap_content"
+                android:background="@drawable/border_textview"
                 android:hint="Usuario"
-                android:inputType="text"
-                android:textColorHint="#707070"
-                android:background="@color/white"
-                android:padding="6dp"
-                android:layout_weight="1"
-                android:layout_gravity="center"/>
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textStyle="italic" />
 
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/linearlayout5"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:layout_marginTop="30dp"
             android:gravity="center"
-            android:layout_marginBottom="25dp">
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/linearlayout4"
+            app:layout_constraintVertical_bias="0.0">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="20dp"
                 android:text="Email:"
-                android:textColor="@color/white"
+                android:textColor="@color/black"
                 android:textSize="16sp"
-                android:layout_weight="1"
-                android:layout_marginEnd="25dp" />
+                android:textStyle="bold" />
 
             <EditText
                 android:id="@+id/edit_email"
-                android:layout_width="200dp"
+                android:layout_width="40mm"
                 android:layout_height="wrap_content"
+                android:background="@drawable/border_textview"
                 android:hint="Email"
-                android:inputType="textEmailAddress"
-                android:textColorHint="#707070"
-                android:background="@color/white"
-                android:padding="6dp"
-                android:layout_weight="1"
-                android:layout_gravity="center"/>
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textStyle="italic" />
 
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/linearlayout6"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:layout_marginTop="30dp"
             android:gravity="center"
-            android:layout_marginBottom="25dp">
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/linearlayout5"
+            app:layout_constraintVertical_bias="0.0">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="20dp"
                 android:text="Contraseña:"
-                android:textColor="@color/white"
+                android:textColor="@color/black"
                 android:textSize="16sp"
-                android:layout_marginEnd="25dp"
-                android:layout_weight="1" />
+                android:textStyle="bold" />
 
             <EditText
                 android:id="@+id/edit_pass"
-                android:layout_width="200dp"
+                android:layout_width="40mm"
                 android:layout_height="wrap_content"
+                android:background="@drawable/border_textview"
                 android:hint="Contraseña"
-                android:inputType="text"
-                android:textColorHint="#707070"
-                android:background="@color/white"
-                android:padding="6dp"
-                android:layout_weight="1"
-                android:layout_gravity="center"/>
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textStyle="italic" />
 
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/linearlayout7"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:layout_marginTop="30dp"
             android:gravity="center"
-            android:layout_marginBottom="25dp">
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/linearlayout6"
+            app:layout_constraintVertical_bias="0.0">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Telefono: "
-                android:textColor="@color/white"
+                android:layout_marginEnd="20dp"
+                android:text="Telefono"
+                android:textColor="@color/black"
                 android:textSize="16sp"
-                android:layout_marginEnd="25dp"
-                android:layout_weight="1" />
+                android:textStyle="bold" />
 
             <EditText
                 android:id="@+id/edit_telefono"
-                android:layout_width="200dp"
+                android:layout_width="40mm"
                 android:layout_height="wrap_content"
+                android:background="@drawable/border_textview"
                 android:hint="Telefono"
-                android:inputType="text"
-                android:textColorHint="#707070"
-                android:background="@color/white"
-                android:padding="6dp"
-                android:layout_weight="1"
-                android:layout_gravity="center"/>
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textStyle="italic" />
 
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/linearlayout8"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:layout_marginTop="30dp"
             android:gravity="center"
-            android:layout_marginBottom="25dp">
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/linearlayout7"
+            app:layout_constraintVertical_bias="0.0">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Direccion:"
-                android:textColor="@color/white"
+                android:layout_marginEnd="20dp"
+                android:text="Direccion"
+                android:textColor="@color/black"
                 android:textSize="16sp"
-                android:layout_marginEnd="25dp"
-                android:layout_weight="1" />
+                android:textStyle="bold" />
 
             <EditText
                 android:id="@+id/edit_address"
-                android:layout_width="200dp"
+                android:layout_width="40mm"
                 android:layout_height="wrap_content"
+                android:background="@drawable/border_textview"
                 android:hint="Direccion"
-                android:inputType="text"
-                android:textColorHint="#707070"
-                android:background="@color/white"
-                android:padding="6dp"
-                android:layout_weight="1"
-                android:layout_gravity="center"/>
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textStyle="italic" />
 
         </LinearLayout>
 
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:layout_marginTop="12dp">
-
         <Button
             android:id="@+id/btn_enviar_registro"
-            android:layout_width="150dp"
-            android:layout_marginEnd="10dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Registrarse"
-            android:layout_gravity="center" />
+            android:layout_marginTop="30dp"
+            android:background="@drawable/fondo_black_radius"
+            android:text="Registrar"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/linearlayout8"
+            app:layout_constraintVertical_bias="0.0" />
 
         <Button
             android:id="@+id/btn_volver_login"
-            android:layout_width="150dp"
-            android:layout_marginStart="10dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Log in"
-            android:layout_gravity="center" />
+            android:layout_marginTop="20dp"
+            android:background="@drawable/border_textview"
+            android:text="Iniciar Sesión"
+            android:textAllCaps="false"
+            android:textColor="@color/black"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btn_enviar_registro" />
 
-    </LinearLayout>
 
-</LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

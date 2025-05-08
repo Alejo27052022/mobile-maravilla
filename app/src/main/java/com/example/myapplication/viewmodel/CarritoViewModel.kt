@@ -36,9 +36,18 @@ class CarritoViewModel(application: Application) : AndroidViewModel(application)
     }
 
     fun agregarAlCarrito(detalle: DetallePedido, nombrePlato: String) {
-        platoNombres.add(Pair(detalle.plato, nombrePlato))
         val listaActualizada = _carrito.value?.toMutableList() ?: mutableListOf()
-        listaActualizada.add(detalle)
+
+        // Verificar si el producto ya existe en el carrito
+        val existente = listaActualizada.find { it.plato == detalle.plato }
+        if (existente != null) {
+            existente.cantidad += detalle.cantidad
+            existente.precio_total += detalle.precio_total
+        } else {
+            listaActualizada.add(detalle)
+            platoNombres.add(Pair(detalle.plato, nombrePlato))
+        }
+
         _carrito.value = listaActualizada
         guardarCarrito()
         viewModelScope.launch {

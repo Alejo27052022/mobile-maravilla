@@ -49,7 +49,7 @@ class MainActivity : ComponentActivity() {
 
             if (Preferencias.esPrimeraVez(this)) {
                 // Mostrar las pantallas de introducción
-                val intent = Intent(this, Login::class.java)
+                val intent = Intent(this, PantallaSeleccion::class.java)
                 startActivity(intent)
             } else {
                 // Redireccionar directamente a la clase Inicio
